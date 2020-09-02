@@ -1,7 +1,11 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import React, { useState, useEffect } from 'react';
 
 export default function Home(props) {
+
+  const [ average, setAverage ] = useState(16)
+  const [ filterCont, setFilterCont ] = useState('')
 
   const datediff = function(first, second){
     // Take the difference between the dates and divide by milliseconds per day.
@@ -22,8 +26,12 @@ export default function Home(props) {
     return (totalNewCases/population*100000).toFixed(2);
   }
 
-  const getTableData = (data) => {
-    return Object.keys(data).map(country => {
+  const getTableData = (data, continent) => {
+    var countries = Object.keys(data)
+    if(continent){
+      countries = countries.filter(c => data[c].continent === continent);
+    }
+    return countries.map(country => {
       var continent;
       if(data[country].continent){
         continent = data[country].continent;
@@ -57,12 +65,14 @@ export default function Home(props) {
         <title>Do I need Quarantine</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className={styles.main}>
         <h1 className={styles.title}>
           Do I need to do Quarantine?
         </h1>
-
+        <label htmlFor='average'>Average cases</label><br/>
+        <input id="average" type="text" placeholder="average" value={average} onChange={ evt => setAverage(evt.target.value)}/><br/>
+        <label htmlFor='filterCont'>Continent</label><br/>
+        <input id="filterCont" type="text" placeholder="filterCont" value={filterCont} onChange={ evt => setFilterCont(evt.target.value)}/><br/>
         <div>
             <table>
             <tr>
@@ -71,9 +81,9 @@ export default function Home(props) {
               <th>Average last 14 days</th>
               <th>Change</th>
             </tr>
-            { props && getTableData(props).map( r => {
+            { props && getTableData(props, filterCont).map( r => {
               return(
-                <tr className={r.average > 16 ? 'red': 'green'}>
+                <tr className={r.average > average ? 'red': 'green'}>
                   <th>{r.continent}</th>
                   <th>{r.country}</th>
                   <th>{r.average}</th>
