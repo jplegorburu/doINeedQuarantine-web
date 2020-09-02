@@ -14,3 +14,11 @@ a {
 * {
   box-sizing: border-box;
 }
+
+table { border-collapse:collapse }
+.green {
+  background-color: rgb(101, 209, 101);
+}
+.red {
+  background-color: rgb(187, 34, 34);
+}
