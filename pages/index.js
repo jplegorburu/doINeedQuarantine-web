@@ -104,7 +104,7 @@ export default function Home(props) {
         </h1>
         <p>
           Most of the countries have a restriction to travel according to the avarage of new cases every certain number of people.<br/><br/>
-          Generally the rate when you would need to do country if you arrive from a country with 16 new cases every 100.000 persons. <br/><br/>
+          Generally the rate when you would need to do quarantine if you arrive from a country is when there are 16 new cases every 100.000 persons. <br/><br/>
           All this data is taken from <a className={styles.linkToPage} href="https://ourworldindata.org/coronavirus" target="_blank" rel="noopener noreferrer">Our World in Data</a><br/>
         </p>
         <div>
