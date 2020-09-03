@@ -146,7 +146,7 @@ export default function Home(props) {
             </tr>
             { props && getTableData(props, filterCont).map( (r,i) => {
               return(
-                <tr className={r.average > average ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
+                <tr className={parseFloat(r.average) >= parseFloat(average) ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
                   <th>{r.continent}</th>
                   <th>{r.country}</th>
                   <th>{r.average}</th>
