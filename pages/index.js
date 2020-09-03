@@ -4,14 +4,35 @@ import React, { useState, useEffect } from 'react';
 
 export default function Home(props) {
 
+  const [highlated, setHighlated] = useState(-1);
   const [ average, setAverage ] = useState(16)
-  const [ filterCont, setFilterCont ] = useState('')
+  const [ filterCont, setFilterCont ] = useState('World')
+  const [ habitants, setHabitants ] = useState(100000)
+  const [ today, setToday ] = useState(formatDate(Date.now()))
+
+  function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 
   const datediff = function(first, second){
     // Take the difference between the dates and divide by milliseconds per day.
     // Round to nearest whole number to deal with DST.
     return Math.round((second-first)/(1000*60*60*24));
   }
+
+  const highlightRow = high => evt => {
+    setHighlated(high);
+}
 
   const getAveragefromLast2Weeks = (data, population, daysFromToday) => {
     var day;
@@ -21,14 +42,25 @@ export default function Home(props) {
     } else{
       day = Date.now();
     }
-    var last2Weeks = data.filter(d => datediff(Date.parse(d.date), day) <=14).map(d => d.new_cases);
+    var last2Weeks = data.filter(d => datediff(Date.parse(d.date), day) <= 14 && datediff(Date.parse(d.date), day) > 0).map(d => d.new_cases);
     var totalNewCases = last2Weeks.reduce((a,b)=>{ return a + b}, 0);
-    return (totalNewCases/population*100000).toFixed(2);
+    return (totalNewCases/population*habitants).toFixed(2);
+  }
+
+  const getContinets = (data) => {
+    var continents = [];
+    new Set(Object.keys(data).map(c => data[c].continent)).forEach(a => continents.push(a))
+    return continents
+  }
+
+  const getNewCases = (data) => {
+    var casesForToday = data.filter(d => d.date === today)[0];
+    return casesForToday? casesForToday.new_cases:0
   }
 
   const getTableData = (data, continent) => {
     var countries = Object.keys(data)
-    if(continent){
+    if(continent != "World"){
       countries = countries.filter(c => data[c].continent === continent);
     }
     return countries.map(country => {
@@ -43,7 +75,8 @@ export default function Home(props) {
         continent: continent,
         country: data[country].location,
         average: getAveragefromLast2Weeks(props[country].data, props[country].population),
-        change: (getAveragefromLast2Weeks(props[country].data, props[country].population,1) - getAveragefromLast2Weeks(props[country].data, props[country].population)).toFixed(2),
+        change: (getAveragefromLast2Weeks(props[country].data, props[country].population) - getAveragefromLast2Weeks(props[country].data, props[country].population, 1)).toFixed(2),
+        newCases: getNewCases(props[country].data),
       }
     }).sort(function(a, b) {
       var nameA = a.continent.toUpperCase(); // ignore upper and lowercase
@@ -69,25 +102,56 @@ export default function Home(props) {
         <h1 className={styles.title}>
           Do I need to do Quarantine?
         </h1>
-        <label htmlFor='average'>Average cases</label><br/>
-        <input id="average" type="text" placeholder="average" value={average} onChange={ evt => setAverage(evt.target.value)}/><br/>
-        <label htmlFor='filterCont'>Continent</label><br/>
-        <input id="filterCont" type="text" placeholder="filterCont" value={filterCont} onChange={ evt => setFilterCont(evt.target.value)}/><br/>
+        <p>
+          Most of the countries have a restriction to travel according to the avarage of new cases every certain number of people.<br/><br/>
+          Generally the rate when you would need to do country if you arrive from a country with 16 new cases every 100.000 persons. <br/><br/>
+          All this data is taken from <a className={styles.linkToPage} href="https://ourworldindata.org/coronavirus" target="_blank" rel="noopener noreferrer">Our World in Data</a><br/>
+        </p>
         <div>
-            <table>
+            <table  className="filterTable">
+                <tr>
+                  <th align="left" ><label htmlFor='average'>Average cases</label></th>
+                  <th align="left" ><label htmlFor='filterCont'>Continent</label></th>
+                  <th align="left" ><label htmlFor='habitants'>Cases every:</label></th>
+                </tr>
+                <tr>
+                  <th align="left" >
+                    <input id="average" type="text" placeholder="average" value={average} onChange={ evt => setAverage(evt.target.value)}/>
+                  </th>
+                  <th align="left" >
+                    <select name="filterCont" id="filterCont" value={filterCont} onChange={ evt => setFilterCont(evt.target.value)}>
+                    { props && getContinets(props).map( r => {
+                          return(<option value={r}>{r?r:"World" }</option>)
+                        })
+                    }
+                    </select>
+                  </th>
+                  <th align="left" >
+                    <select name="habitants" id="habitants" value={habitants} onChange={ evt => setHabitants(evt.target.value)}>
+                      { new Array(4).fill().map( (_, i) => {
+                            return(<option value={Math.pow(10, i+4)}>{Math.pow(10, i+4)}</option>)
+                          })
+                      }
+                    </select>
+                  </th>
+                </tr>
+            </table>
+            <table className="dataTable">
             <tr>
               <th>Continent</th>
               <th>Country</th>
-              <th>Average last 14 days</th>
+              <th>Average <br />last 14 days</th>
               <th>Change</th>
+              <th>New Cases <br />({today})</th>
             </tr>
-            { props && getTableData(props, filterCont).map( r => {
+            { props && getTableData(props, filterCont).map( (r,i) => {
               return(
-                <tr className={r.average > average ? 'red': 'green'}>
+                <tr className={r.average > average ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
                   <th>{r.continent}</th>
                   <th>{r.country}</th>
                   <th>{r.average}</th>
                   <th>{r.change}</th>
+                  <th>{r.newCases}</th>
                 </tr>
                 )
               })
@@ -97,14 +161,9 @@ export default function Home(props) {
       </main>
 
       <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
+        <p className={styles.logo}>
+          Powered by{'Sir Chompoldus'}
+        </p>
       </footer>
     </div>
   )

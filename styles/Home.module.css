@@ -46,6 +46,18 @@
   text-decoration: underline;
 }
 
+
+.linkToPage a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.linkToPage a:hover,
+.linkToPage a:focus,
+.linkToPage a:active {
+  text-decoration: underline;
+}
+
 .title {
   margin: 0;
   line-height: 1.15;
