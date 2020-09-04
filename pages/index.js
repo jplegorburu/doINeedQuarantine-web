@@ -85,7 +85,7 @@ export default function Home(props) {
     }).sort(function(a, b) {
       var nameA = a[sortParam].toString().toUpperCase(); // ignore upper and lowercase
       var nameB = b[sortParam].toString().toUpperCase(); // ignore upper and lowercase
-      if(parseFloat(nameA) !== NaN || parseFloat(nameB) !== NaN){
+      if(parseFloat(nameA)|| parseFloat(nameB)){
         nameA = parseFloat(nameA);
         nameB = parseFloat(nameB);
       }
