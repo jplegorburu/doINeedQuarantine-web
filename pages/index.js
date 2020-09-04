@@ -181,6 +181,7 @@ export async function getStaticProps() {
   // The value of the `props` key will be
   //  passed to the `Home` component
   return {
-    props: data
+    props: data,
+    revalidate: 10
   }
 }
