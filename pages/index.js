@@ -9,6 +9,10 @@ export default function Home(props) {
   const [ filterCont, setFilterCont ] = useState('World')
   const [ habitants, setHabitants ] = useState(100000)
   const [ today, setToday ] = useState(formatDate(Date.now()))
+  const [ sortParam, setSortParam ] = useState('continent')
+  const [ sortOrder, setSortOrder ] = useState(1)
+
+  const changeSortOrder = (_) => {(sortOrder===1? setSortOrder(-1): setSortOrder(1))}
 
   function formatDate(date) {
     var d = new Date(date),
@@ -79,13 +83,17 @@ export default function Home(props) {
         newCases: getNewCases(props[country].data),
       }
     }).sort(function(a, b) {
-      var nameA = a.continent.toUpperCase(); // ignore upper and lowercase
-      var nameB = b.continent.toUpperCase(); // ignore upper and lowercase
+      var nameA = a[sortParam].toString().toUpperCase(); // ignore upper and lowercase
+      var nameB = b[sortParam].toString().toUpperCase(); // ignore upper and lowercase
+      if(parseFloat(nameA) !== NaN || parseFloat(nameB) !== NaN){
+        nameA = parseFloat(nameA);
+        nameB = parseFloat(nameB);
+      }
       if (nameA < nameB) {
-        return -1;
+        return -sortOrder;
       }
       if (nameA > nameB) {
-        return 1;
+        return sortOrder;
       }
       // names must be equal
       return 0;
@@ -99,8 +107,8 @@ export default function Home(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Do I need to do Quarantine?
+        <img src="/larger_icon.png" alt="Logo" className={styles.logo} />
+        <h1 className={styles.title}>Do I need to do Quarantine?
         </h1>
         <p>
           Most of the countries have a restriction to travel according to the avarage of new cases every certain number of people.<br/><br/>
@@ -138,11 +146,11 @@ export default function Home(props) {
             </table>
             <table className="dataTable">
             <tr>
-              <th>Continent</th>
-              <th>Country</th>
-              <th>Average <br />last 14 days</th>
-              <th>Change</th>
-              <th>New Cases <br />({today})</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('continent')}>Continent</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('country')}>Country</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('average')}>Average <br />last 14 days</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('change')}>Change</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCases')}>New Cases <br />({today})</th>
             </tr>
             { props && getTableData(props, filterCont).map( (r,i) => {
               return(
@@ -162,7 +170,7 @@ export default function Home(props) {
 
       <footer className={styles.footer}>
         <p className={styles.logo}>
-          Powered by{'Sir Chompoldus'}
+          Powered by {'Sir Chompoldus'}
         </p>
       </footer>
     </div>
