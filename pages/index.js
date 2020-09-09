@@ -39,12 +39,9 @@ export default function Home(props) {
 }
 
   const getAveragefromLast2Weeks = (data, population, daysFromToday) => {
-    var day;
+    var day = new Date(today);
     if(daysFromToday){
-      day = new Date();
       day.setDate(day.getDate() - daysFromToday)
-    } else{
-      day = Date.now();
     }
     var last2Weeks = data.filter(d => datediff(Date.parse(d.date), day) <= 14 && datediff(Date.parse(d.date), day) > 0).map(d => d.new_cases);
     var totalNewCases = last2Weeks.reduce((a,b)=>{ return a + b}, 0);
@@ -57,8 +54,12 @@ export default function Home(props) {
     return continents
   }
 
-  const getNewCases = (data) => {
-    var casesForToday = data.filter(d => d.date === today)[0];
+  const getNewCases = (data, daysFromToday) => {
+    var day = new Date(today);
+    if(daysFromToday){
+      day.setDate(day.getDate() - daysFromToday)
+    }
+    var casesForToday = data.filter(d => d.date === day)[0];
     return casesForToday? casesForToday.new_cases:0
   }
 
@@ -81,6 +82,7 @@ export default function Home(props) {
         average: getAveragefromLast2Weeks(props[country].data, props[country].population),
         change: (getAveragefromLast2Weeks(props[country].data, props[country].population) - getAveragefromLast2Weeks(props[country].data, props[country].population, 1)).toFixed(2),
         newCases: getNewCases(props[country].data),
+        newCasesYesterday: getNewCases(props[country].data, 1),
       }
     }).sort(function(a, b) {
       var nameA = a[sortParam].toString().toUpperCase(); // ignore upper and lowercase
@@ -108,7 +110,7 @@ export default function Home(props) {
       </Head>
       <main className={styles.main}>
         <img src="/larger_icon.png" alt="Logo" className={styles.logo} />
-        <h1 className={styles.title}>Do I need to do Quarantine?
+        <h1 className={styles.title}>Do I need to do quarantine?
         </h1>
         <p>
           Most of the countries have a restriction to travel according to the avarage of new cases every certain number of people.<br/><br/>
@@ -151,6 +153,7 @@ export default function Home(props) {
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('average')}>Average <br />last 14 days</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('change')}>Change</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCases')}>New Cases <br />({today})</th>
+              <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCasesYesterday')}>New Cases <br />(Yesterday)</th>
             </tr>
             { props && getTableData(props, filterCont).map( (r,i) => {
               return(
@@ -160,6 +163,7 @@ export default function Home(props) {
                   <th>{r.average}</th>
                   <th>{r.change}</th>
                   <th>{r.newCases}</th>
+                  <th>{r.newCasesYesterday}</th>
                 </tr>
                 )
               })
