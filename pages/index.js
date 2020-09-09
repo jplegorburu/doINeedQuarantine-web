@@ -59,7 +59,7 @@ export default function Home(props) {
     if(daysFromToday){
       day.setDate(day.getDate() - daysFromToday)
     }
-    var casesForToday = data.filter(d => d.date === day)[0];
+    var casesForToday = data.filter(d => d.date === formatDate(day))[0];
     return casesForToday? casesForToday.new_cases:0
   }
 
