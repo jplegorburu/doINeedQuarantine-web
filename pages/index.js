@@ -79,10 +79,10 @@ export default function Home(props) {
       return {
         continent: continent,
         country: data[country].location,
-        average: getAveragefromLast2Weeks(props[country].data, props[country].population),
-        change: (getAveragefromLast2Weeks(props[country].data, props[country].population) - getAveragefromLast2Weeks(props[country].data, props[country].population, 1)).toFixed(2),
-        newCases: getNewCases(props[country].data),
-        newCasesYesterday: getNewCases(props[country].data, 1),
+        average: getAveragefromLast2Weeks(data[country].data, data[country].population),
+        change: (getAveragefromLast2Weeks(data[country].data, data[country].population) - getAveragefromLast2Weeks(data[country].data, data[country].population, 1)).toFixed(2),
+        newCases: getNewCases(data[country].data),
+        newCasesYesterday: getNewCases(data[country].data, 1),
       }
     }).sort(function(a, b) {
       var nameA = a[sortParam].toString().toUpperCase(); // ignore upper and lowercase
@@ -194,6 +194,6 @@ export async function getStaticProps() {
   //  passed to the `Home` component
   return {
     props: data,
-    revalidate: 10
+    revalidate: 30
   }
 }
