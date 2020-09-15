@@ -1,11 +1,9 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import React, { useState, useEffect } from 'react';
-import { useFetch } from '../hooks/useFetch'
 
 export default function Home(props) {
 
-  const [covidData, setCovidData] = useState(props);
   const [highlated, setHighlated] = useState(-1);
   const [ average, setAverage ] = useState(16)
   const [ filterCont, setFilterCont ] = useState('World')
@@ -13,11 +11,6 @@ export default function Home(props) {
   const [ today, setToday ] = useState(formatDate(Date.now()))
   const [ sortParam, setSortParam ] = useState('continent')
   const [ sortOrder, setSortOrder ] = useState(1)
-  const [ data, loading, error] = useFetch();
-
-  useEffect(()=>{
-    setCovidData(data);
-  }, [data])
 
   const changeSortOrder = (_) => {(sortOrder===1? setSortOrder(-1): setSortOrder(1))}
 
@@ -109,8 +102,6 @@ export default function Home(props) {
     });
   }
 
-  //if(loading) return <h1>Loading...</h1>
-  if(error) return <h1>Error Loading movies</h1>
   return (
     <div className={styles.container}>
       <Head>
@@ -128,22 +119,19 @@ export default function Home(props) {
         </p>
         <div>
             <table  className="filterTable">
-              <thead>
                 <tr>
                   <th align="left" ><label htmlFor='average'>Average cases</label></th>
                   <th align="left" ><label htmlFor='filterCont'>Continent</label></th>
                   <th align="left" ><label htmlFor='habitants'>Cases every:</label></th>
                 </tr>
-              </thead>
-              <tbody>
                 <tr>
                   <th align="left" >
                     <input id="average" type="text" placeholder="average" value={average} onChange={ evt => setAverage(evt.target.value)}/>
                   </th>
                   <th align="left" >
                     <select name="filterCont" id="filterCont" value={filterCont} onChange={ evt => setFilterCont(evt.target.value)}>
-                    { covidData && getContinets(covidData).map( (r, i) => {
-                          return(<option key={r?r:"World"} value={r}>{r?r:"World" }</option>)
+                    { props && getContinets(props).map( r => {
+                          return(<option value={r}>{r?r:"World" }</option>)
                         })
                     }
                     </select>
@@ -151,16 +139,14 @@ export default function Home(props) {
                   <th align="left" >
                     <select name="habitants" id="habitants" value={habitants} onChange={ evt => setHabitants(evt.target.value)}>
                       { new Array(4).fill().map( (_, i) => {
-                            return(<option key={Math.pow(10, i+4)} value={Math.pow(10, i+4)}>{Math.pow(10, i+4)}</option>)
+                            return(<option value={Math.pow(10, i+4)}>{Math.pow(10, i+4)}</option>)
                           })
                       }
                     </select>
                   </th>
                 </tr>
-                </tbody>
             </table>
             <table className="dataTable">
-            <thead>
             <tr>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('continent')}>Continent</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('country')}>Country</th>
@@ -169,11 +155,9 @@ export default function Home(props) {
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCases')}>New Cases <br />({today})</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCasesYesterday')}>New Cases <br />(Yesterday)</th>
             </tr>
-            </thead>
-            <tbody>
-            { covidData && getTableData(covidData, filterCont).map( (r,i) => {
+            { props && getTableData(props, filterCont).map( (r,i) => {
               return(
-                <tr key={r.country} className={parseFloat(r.average) >= parseFloat(average) ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
+                <tr className={parseFloat(r.average) >= parseFloat(average) ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
                   <th>{r.continent}</th>
                   <th>{r.country}</th>
                   <th>{r.average}</th>
@@ -184,7 +168,6 @@ export default function Home(props) {
                 )
               })
             }
-            </tbody>
             </table>
         </div>
       </main>
