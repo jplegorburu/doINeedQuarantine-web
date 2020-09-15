@@ -110,7 +110,7 @@ export default function Home(props) {
   }
 
   //if(loading) return <h1>Loading...</h1>
-  if(error) return <h1>Error Loading Data</h1>
+  if(error) return <h1>Error Loading movies</h1>
   return (
     <div className={styles.container}>
       <Head>
