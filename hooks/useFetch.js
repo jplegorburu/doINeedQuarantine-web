@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const HOST_NAME = process.env.HOST_NAME || 'http://localhost:3000/';
+const HOST_NAME = process.env.HOST_NAME || 'https://doineedquarantine.vercel.app/';
 
 function useFetch(){
     const [data, setData] = useState([]);
