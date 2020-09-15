@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function Home(props) {
 
-  const [highlated, setHighlated] = useState(-1);
+  const [ highlated, setHighlated ] = useState(-1);
   const [ average, setAverage ] = useState(16)
   const [ filterCont, setFilterCont ] = useState('World')
   const [ habitants, setHabitants ] = useState(100000)
@@ -119,11 +119,14 @@ export default function Home(props) {
         </p>
         <div>
             <table  className="filterTable">
+              <thead>
                 <tr>
                   <th align="left" ><label htmlFor='average'>Average cases</label></th>
                   <th align="left" ><label htmlFor='filterCont'>Continent</label></th>
                   <th align="left" ><label htmlFor='habitants'>Cases every:</label></th>
                 </tr>
+                </thead>
+                <tbody>
                 <tr>
                   <th align="left" >
                     <input id="average" type="text" placeholder="average" value={average} onChange={ evt => setAverage(evt.target.value)}/>
@@ -131,7 +134,7 @@ export default function Home(props) {
                   <th align="left" >
                     <select name="filterCont" id="filterCont" value={filterCont} onChange={ evt => setFilterCont(evt.target.value)}>
                     { props && getContinets(props).map( r => {
-                          return(<option value={r}>{r?r:"World" }</option>)
+                          return(<option key={r?r:"World" } value={r}>{r?r:"World" }</option>)
                         })
                     }
                     </select>
@@ -139,14 +142,16 @@ export default function Home(props) {
                   <th align="left" >
                     <select name="habitants" id="habitants" value={habitants} onChange={ evt => setHabitants(evt.target.value)}>
                       { new Array(4).fill().map( (_, i) => {
-                            return(<option value={Math.pow(10, i+4)}>{Math.pow(10, i+4)}</option>)
+                            return(<option key={Math.pow(10, i+4)} value={Math.pow(10, i+4)}>{Math.pow(10, i+4)}</option>)
                           })
                       }
                     </select>
                   </th>
                 </tr>
+                </tbody>
             </table>
             <table className="dataTable">
+            <thead>
             <tr>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('continent')}>Continent</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('country')}>Country</th>
@@ -155,9 +160,11 @@ export default function Home(props) {
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCases')}>New Cases <br />({today})</th>
               <th onDoubleClick={changeSortOrder} onClick={ evt => setSortParam('newCasesYesterday')}>New Cases <br />(Yesterday)</th>
             </tr>
+            </thead>
+            <tbody>
             { props && getTableData(props, filterCont).map( (r,i) => {
               return(
-                <tr className={parseFloat(r.average) >= parseFloat(average) ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
+                <tr key={r.country} className={parseFloat(r.average) >= parseFloat(average) ? (highlated===i? 'red-highlated': 'red'): (highlated===i? 'green-highlated': 'green')} onMouseEnter={highlightRow(i)} onMouseLeave={highlightRow(-1)}>
                   <th>{r.continent}</th>
                   <th>{r.country}</th>
                   <th>{r.average}</th>
@@ -168,6 +175,7 @@ export default function Home(props) {
                 )
               })
             }
+            </tbody>
             </table>
         </div>
       </main>
@@ -194,6 +202,6 @@ export async function getStaticProps() {
   //  passed to the `Home` component
   return {
     props: data,
-    revalidate: 30
+    revalidate: 10
   }
 }
