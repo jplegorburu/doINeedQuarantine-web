@@ -15,7 +15,7 @@ function useFetch(){
             const data = await fetch(`${HOST_NAME}api/hello`)
                 .then( resp => resp.json())
                 .catch(err => setError(err));
-            setData(data);
+            if(data) setData(data);
             setLoading(false);
         }
 
