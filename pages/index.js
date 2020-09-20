@@ -121,7 +121,7 @@ export default function Home(props) {
             <table  className="filterTable">
               <thead>
                 <tr>
-                  <th align="left" ><label htmlFor='average'>Average cases</label></th>
+                  <th align="left" ><label htmlFor='average'>Average Cases</label></th>
                   <th align="left" ><label htmlFor='filterCont'>Continent</label></th>
                   <th align="left" ><label htmlFor='habitants'>Cases every:</label></th>
                 </tr>
